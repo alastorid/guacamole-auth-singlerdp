@@ -1,0 +1,12 @@
+{
+
+    "guacamoleVersion" : "0.9.12-incubating",
+
+    "name"      : "Single RDP Authentication Extension",
+    "namespace" : "guac-auth-singlerdp",
+
+    "authProviders" : [
+        "com.github.evanlinde.guacamole.auth.SingleRDPAuthenticationProvider"
+    ]
+
+}
