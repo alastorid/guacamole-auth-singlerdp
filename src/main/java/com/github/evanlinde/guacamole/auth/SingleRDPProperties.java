@@ -32,4 +32,10 @@ public class SingleRDPProperties {
         public String getName() { return "singlerdp-port"; }
     };
 
+    public static final StringGuacamoleProperty SINGLERDP_IGNORE_CERT = 
+        new StringGuacamoleProperty() {
+        @Override
+        public String getName() { return "singlerdp-ignore-cert"; }
+    };
+
 }

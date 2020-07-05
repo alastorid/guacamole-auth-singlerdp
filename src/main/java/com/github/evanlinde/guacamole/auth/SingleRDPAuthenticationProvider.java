@@ -33,6 +33,7 @@ public class SingleRDPAuthenticationProvider extends SimpleAuthenticationProvide
         String hostname = env.getRequiredProperty(SingleRDPProperties.SINGLERDP_HOSTNAME);
         String port = env.getRequiredProperty(SingleRDPProperties.SINGLERDP_PORT);      
         String title = env.getRequiredProperty(SingleRDPProperties.SINGLERDP_TITLE);
+        String ignore_cert = env.getProperty(SingleRDPProperties.SINGLERDP_IGNORE_CERT, "false");
 
         // Return a single RDP connection with the given hostname, port, and title
         Map<String, GuacamoleConfiguration> configs = new HashMap<String, GuacamoleConfiguration>();
@@ -40,6 +41,7 @@ public class SingleRDPAuthenticationProvider extends SimpleAuthenticationProvide
         config.setProtocol("rdp");
         config.setParameter("hostname", hostname);
         config.setParameter("port", port);
+        config.setParameter("ignore-cert", ignore_cert);
         configs.put(title, config);
 
         return configs;

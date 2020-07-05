@@ -38,6 +38,17 @@ hostname to the IP or hostname of the target RDP server and the title to
 what you want to appear in the title bar. You'll only need to change the 
 port if your RDP server is using a non-standard port.
 
+Optional Settings
+-----------------
+
+The following additional settings can be configured in `guacamole.properties`
+but are not required.
+
+
+Setting                    | Default 
+---------------------------|--------------
+singlerdp-ignore-cert      | false
+
 
 Updating for new guacamole versions
 ===================================
