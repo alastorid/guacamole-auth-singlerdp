@@ -1,6 +1,6 @@
 {
 
-    "guacamoleVersion" : "1.5.4",
+    "guacamoleVersion" : "1.6.0",
 
     "name"      : "Single RDP Authentication Extension",
     "namespace" : "guac-auth-singlerdp",
