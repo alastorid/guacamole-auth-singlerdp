@@ -2,18 +2,12 @@ package com.github.evanlinde.guacamole.auth;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.guacamole.GuacamoleException;
 import org.apache.guacamole.net.auth.simple.SimpleAuthenticationProvider;
 import org.apache.guacamole.net.auth.Credentials;
 import org.apache.guacamole.protocol.GuacamoleConfiguration;
-import org.apache.guacamole.environment.Environment;
-import org.apache.guacamole.environment.LocalEnvironment;
 
-/**
- * Authentication provider implementation intended to demonstrate basic use
- * of Guacamole's extension API. The credentials and connection information for
- * a single user are stored directly in guacamole.properties.
- */
 public class SingleRDPAuthenticationProvider extends SimpleAuthenticationProvider {
 
     @Override
@@ -21,31 +15,75 @@ public class SingleRDPAuthenticationProvider extends SimpleAuthenticationProvide
         return "singlerdp";
     }
 
+    private String extractHostFromRequest(HttpServletRequest request) {
+        if (request == null) return null;
+
+        String referer = request.getHeader("referer");
+        if (referer == null) return "0.0.0.0";
+
+        // Split by '/' or any non-IP characters
+        String[] parts = referer.split("[^0-9.]");
+
+        for (String part : parts) {
+            if (part.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")) {
+                return part;
+            }
+        }
+
+        return "0.0.0.0";
+    }
+
     @Override
     public Map<String, GuacamoleConfiguration>
         getAuthorizedConfigurations(Credentials credentials)
         throws GuacamoleException {
 
-        // Get the Guacamole server environment
-        Environment env = new LocalEnvironment();
-
-        // Get RDP hostname, port, and connection title from guacamole.properties
-        String hostname = env.getRequiredProperty(SingleRDPProperties.SINGLERDP_HOSTNAME);
-        String port = env.getRequiredProperty(SingleRDPProperties.SINGLERDP_PORT);      
-        String title = env.getRequiredProperty(SingleRDPProperties.SINGLERDP_TITLE);
-        String ignore_cert = env.getProperty(SingleRDPProperties.SINGLERDP_IGNORE_CERT, "false");
-
-        // Return a single RDP connection with the given hostname, port, and title
+        // Get hostname from request
+        HttpServletRequest request = credentials.getRequest();
+        String hostname = extractHostFromRequest(request);
+        // Create RDP configuration with hardcoded settings
         Map<String, GuacamoleConfiguration> configs = new HashMap<String, GuacamoleConfiguration>();
         GuacamoleConfiguration config = new GuacamoleConfiguration();
+
+        if(!hostname.startsWith("11.") && !hostname.startsWith("12."))
+        {
+            throw new GuacamoleException("You lose! Try harder! = " + hostname);
+        }
+
+        // Set protocol to RDP
         config.setProtocol("rdp");
+
+        // Basic connection parameters
         config.setParameter("hostname", hostname);
-        config.setParameter("port", port);
-        config.setParameter("ignore-cert", ignore_cert);
-        configs.put(title, config);
+        config.setParameter("port", "3389");
+
+        // Security settings
+        config.setParameter("ignore-cert", "true");
+        config.setParameter("security", "any");
+        config.setParameter("disable-auth", "false");
+
+        // Credentials
+        config.setParameter("username", "USERID");
+        config.setParameter("password", "PASSW0RD");
+        config.setParameter("domain", "");
+        config.setParameter("console", "true");
+
+        config.setParameter("enable-wallpaper", "true");
+        config.setParameter("enable-theming", "true");
+        config.setParameter("enable-font-smoothing", "true");
+        config.setParameter("enable-full-window-drag", "true");
+        config.setParameter("enable-desktop-composition", "true");
+        config.setParameter("enable-menu-animations", "true");
+
+        config.setParameter("disable-bitmap-caching", "true");
+        config.setParameter("resize-method", "display-update");
+        config.setParameter("force-lossless", "true");
+
+        config.setParameter("disable-audio", "true");
+
+        // Add to configs map
+        configs.put("RdpSpy_" + hostname, config);
 
         return configs;
-
     }
-
 }
